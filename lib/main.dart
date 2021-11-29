@@ -43,7 +43,19 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     checkLoginStatus();
-    _determinePosition();
+
+  }
+
+  checkLoginStatus() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+
+    if (sharedPreferences.getString("token") == null) {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
+              (Route<dynamic> route) => false);
+    }else{
+      _determinePosition();
+    }
   }
 
   _determinePosition() async {
@@ -160,15 +172,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  checkLoginStatus() async {
-    sharedPreferences = await SharedPreferences.getInstance();
 
-    if (sharedPreferences.getString("token") == null) {
-      Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
-          (Route<dynamic> route) => false);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

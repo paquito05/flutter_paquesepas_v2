@@ -259,7 +259,7 @@ class _hotelPageState extends State<hotelPage> {
             height: 100,
             decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage("asset/images/sushi.png"))),
+                    image: NetworkImage("${plato.imagen}"))),
           ),
           Column(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -280,13 +280,7 @@ class _hotelPageState extends State<hotelPage> {
               SizedBox(
                 height: 5,
               ),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 7, horizontal: 20),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(30)),
-                    border: Border.all(color: black)),
-                child: Text("+ Cart"),
-              )
+
             ],
           )
         ],

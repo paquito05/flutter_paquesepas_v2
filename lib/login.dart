@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:foodorderapp/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:foodorderapp/signup.dart';
 import 'dart:developer';
 
 class LoginPage extends StatefulWidget {
@@ -15,29 +16,142 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
+  bool _isObscure = true;
+
+  final TextEditingController emailController = new TextEditingController();
+  final TextEditingController passwordController = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light
         .copyWith(statusBarColor: Colors.transparent));
+
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-              colors: [Colors.tealAccent, Colors.cyan],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter),
-        ),
-        child: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : ListView(
-                children: <Widget>[
-                  headerSection(),
-                  textSection(),
-                  buttonSection(),
-                ],
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: EdgeInsets.symmetric(horizontal: 30),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 120,
+                    ),
+
+                    Column(
+                      children: [
+                        Center(
+                          child: Container(
+                            padding: EdgeInsets.all(50),
+                            width: 300,
+                            height: 130,
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image:
+                                        AssetImage("asset/images/Logo_6.png"),
+                                    fit: BoxFit.cover)),
+                          ),
+                        ),
+                        Center(
+                          child: Text('PA QUE SEPAS',
+                              style: TextStyle(
+                                  color: Color(0xFF59706F),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500)),
+                        )
+                      ],
+                    ),
+
+                    SizedBox(
+                      height: 5,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Column(
+                      children: [
+                        buildInputForm('Email', false, emailController),
+                        buildInputForm('Password', true, passwordController),
+                      ],
+                    ),
+
+                    SizedBox(
+                      height: 20,
+                    ),
+
+                    InkWell(
+                      onTap: emailController.text == "" ||
+                              passwordController.text == ""
+                          ? null
+                          : () {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              signIn(emailController.text,
+                                  passwordController.text);
+                            },
+                      child: Container(
+                        alignment: Alignment.center,
+                        height: MediaQuery.of(context).size.height * 0.08,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            color: Colors.greenAccent),
+                        child: Text(
+                          "Login",
+                          style: TextStyle(
+                            color: Colors.greenAccent,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ).copyWith(color: Color(0xFFFFFFFF)),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      children: [
+                        Text('¿ Eres nuevo en la Aplicacion?',
+                            style: TextStyle(
+                                color: Color(0xFF59706F),
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500)),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SignUpScreen(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Registrate',
+                            style: TextStyle(
+                              color: Color(0xFF1B383A),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                            ).copyWith(
+                              decoration: TextDecoration.underline,
+                              decorationThickness: 1,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    //LoginOption(),
+                  ],
+                ),
               ),
-      ),
+            ),
     );
   }
 
@@ -47,7 +161,8 @@ class _LoginPageState extends State<LoginPage> {
     Map data = {'email': email, 'password': pass, 'gettoken': true};
     var jsonResponse = null;
 
-    var response = await http.post(Uri.parse('https://paquesepas-api.herokuapp.com/api/login'),
+    var response = await http.post(
+        Uri.parse('https://paquesepas-api.herokuapp.com/api/login'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(data),
         encoding: Encoding.getByName('utf-8'));
@@ -75,81 +190,40 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Container headerSection() {
-    return Container(
-      margin: EdgeInsets.only(top: 50.0),
-      padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 30.0),
-      child: Text("Pa Que Sepas ",
-          style: TextStyle(
-              color: Colors.white70,
-              fontSize: 40.0,
-              fontWeight: FontWeight.bold)),
-    );
-  }
-
-
-
-
-  final TextEditingController emailController = new TextEditingController();
-  final TextEditingController passwordController = new TextEditingController();
-
-  Container textSection() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0),
-      child: Column(
-        children: <Widget>[
-          TextFormField(
-            controller: emailController,
-            cursorColor: Colors.white,
-            style: TextStyle(color: Colors.white70),
-            decoration: InputDecoration(
-              icon: Icon(Icons.email, color: Colors.white70),
-              hintText: "Email",
-              border: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white70)),
-              hintStyle: TextStyle(color: Colors.white70),
+  Padding buildInputForm(
+      String label, bool pass, TextEditingController controller) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 5),
+      child: TextFormField(
+        controller: controller,
+        obscureText: pass ? _isObscure : false,
+        decoration: InputDecoration(
+            labelText: label,
+            labelStyle: TextStyle(
+              color: Color(0xFF979797),
             ),
-          ),
-          SizedBox(height: 30.0),
-          TextFormField(
-            controller: passwordController,
-            cursorColor: Colors.white,
-            obscureText: true,
-            style: TextStyle(color: Colors.white70),
-            decoration: InputDecoration(
-              icon: Icon(Icons.lock, color: Colors.white70),
-              hintText: "Password",
-              border: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white70)),
-              hintStyle: TextStyle(color: Colors.white70),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFF1B383A)),
             ),
-          ),
-        ],
+            suffixIcon: pass
+                ? IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _isObscure = !_isObscure;
+                      });
+                    },
+                    icon: _isObscure
+                        ? Icon(
+                            Icons.visibility_off,
+                            color: Color(0xFF979797),
+                          )
+                        : Icon(
+                            Icons.visibility,
+                            color: Color(0xFF1B383A),
+                          ),
+                  )
+                : null),
       ),
     );
   }
-
-  Container buttonSection() {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: 40.0,
-      padding: EdgeInsets.symmetric(horizontal: 30.0),
-      margin: EdgeInsets.only(top: 15.0),
-      child: RaisedButton(
-        onPressed: emailController.text == "" || passwordController.text == ""
-            ? null
-            : () {
-          setState(() {
-            _isLoading = true;
-          });
-          signIn(emailController.text, passwordController.text);
-        },
-        elevation: 0.0,
-        color: Colors.cyanAccent,
-        child: Text("Sign In", style: TextStyle(color: Colors.white70)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
-      ),
-    );
-  }
-
 }
