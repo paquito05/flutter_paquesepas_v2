@@ -128,11 +128,11 @@ class _MyHomePageState extends State<MyHomePage> {
           List<String> place_name_split = place_name.split(",");
 
           print(place_name_split);
-          var provincia = place_name_split[3];
-          var distrito = place_name_split[4];
+          var provincia = place_name_split[place_name_split.length - 4];
+          var distrito = place_name_split[place_name_split.length - 3];
 
-          print(provincia);
-          print(distrito);
+          print("pro "+provincia);
+          print("distrito "+distrito);
 
           CallApi()
               .getRestauranteData('empresas/1', distrito, provincia)
